@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		63B1FE7723D82E8500982C7F /* Animal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63B1FE7623D82E8500982C7F /* Animal.swift */; };
 		CEDCA57B22668AB2009EA535 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEDCA57A22668AB2009EA535 /* AppDelegate.swift */; };
 		CEDCA58022668AB2009EA535 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CEDCA57E22668AB2009EA535 /* Main.storyboard */; };
 		CEDCA58222668AB2009EA535 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CEDCA58122668AB2009EA535 /* Assets.xcassets */; };
@@ -20,6 +21,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		63B1FE7623D82E8500982C7F /* Animal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Animal.swift; sourceTree = "<group>"; };
 		CEDCA57722668AB2009EA535 /* AnimalSpotter.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AnimalSpotter.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CEDCA57A22668AB2009EA535 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		CEDCA57F22668AB2009EA535 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -78,6 +80,7 @@
 		CEDCA5962266966C009EA535 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				63B1FE7623D82E8500982C7F /* Animal.swift */,
 				CEFFEF6022B98E4600A646FB /* User.swift */,
 				CEFFEF6222B98E5200A646FB /* Bearer.swift */,
 			);
@@ -175,6 +178,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				CEDCA59A226697BD009EA535 /* APIController.swift in Sources */,
+				63B1FE7723D82E8500982C7F /* Animal.swift in Sources */,
 				CEDCA59122668D0F009EA535 /* LoginViewController.swift in Sources */,
 				CEFFEF6122B98E4600A646FB /* User.swift in Sources */,
 				CEFFEF6322B98E5200A646FB /* Bearer.swift in Sources */,
