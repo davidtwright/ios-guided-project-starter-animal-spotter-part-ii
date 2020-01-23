@@ -19,7 +19,7 @@ enum NetworkError: Error {
     case badAuth
     case otherError
     case badData
-    case noDecode
+    case decodingError
 }
 
 class APIController {
@@ -27,6 +27,8 @@ class APIController {
     private let baseUrl = URL(string: "https://lambdaanimalspotter.vapor.cloud/api")!
     var bearer: Bearer?
     
+    // MARK: - Sign Up
+
     func signUp(with user: User, completion: @escaping (Error?) -> ()) {
         let signUpUrl = baseUrl.appendingPathComponent("users/signup")
         
@@ -58,6 +60,8 @@ class APIController {
             completion(nil)
         }.resume()
     }
+    
+    // MARK: - Sign In
     
     func signIn(with user: User, completion: @escaping (Error?) -> ()) {
         let loginUrl = baseUrl.appendingPathComponent("users/login")
@@ -105,8 +109,8 @@ class APIController {
         }.resume()
     }
     
+    // MARK: - Fetch All Animal Names
     // create function for fetching all animal names
-    
     func fetchAllAnimalNames(completion: @escaping (Result<[String], NetworkError>) -> Void) {
         guard let bearer = bearer else {
             completion(.failure(.noAuth))
@@ -143,14 +147,13 @@ class APIController {
                 completion(.success(animalNames))
             } catch {
                 print("Error decoding animal objects: \(error)")
-                completion(.failure(.noDecode))
-                return
+                completion(.failure(.decodingError))
             }
         }.resume()
     }
     
+    // MARK: - Fetch Animal Details
     // create function for fetching a specific animal
-    
     func fetchDetails(for animalName: String, completion: @escaping (Result<Animal, NetworkError>) -> Void) {
         guard let bearer = bearer else {
             completion(.failure(.noAuth))
@@ -158,7 +161,6 @@ class APIController {
         }
         
         let animalUrl = baseUrl.appendingPathComponent("animals/\(animalName)")
-        
         var request = URLRequest(url: animalUrl)
         request.httpMethod = HTTPMethod.get.rawValue
         request.setValue("Bearer \(bearer.token)", forHTTPHeaderField: "Authorization")
@@ -183,26 +185,30 @@ class APIController {
             
             let decoder = JSONDecoder()
             decoder.dateDecodingStrategy = .secondsSince1970
+            
             do {
                 let animal = try decoder.decode(Animal.self, from: data)
                 completion(.success(animal))
             } catch {
                 print("Error decoding animal object: \(error)")
-                completion(.failure(.noDecode))
-                return
+                completion(.failure(.decodingError))
             }
         }.resume()
     }
     
+    // MARK: - Fetch Image
     // create function to fetch image
     func fetchImage(at urlString: String, completion: @escaping (Result<UIImage, NetworkError>) -> Void) {
-        let imageUrl = URL(string: urlString)!
+        guard let imageUrl = URL(string: urlString) else {
+            completion(.failure(.otherError))
+            return
+        }
         
         var request = URLRequest(url: imageUrl)
         request.httpMethod = HTTPMethod.get.rawValue
         
         URLSession.shared.dataTask(with: request) { data, _, error in
-            if let _ = error {
+            guard error == nil else {
                 completion(.failure(.otherError))
                 return
             }
@@ -212,7 +218,11 @@ class APIController {
                 return
             }
             
-            let image = UIImage(data: data)!
+            guard let image = UIImage(data: data) else {
+                completion(.failure(.decodingError))
+                return
+            }
+            
             completion(.success(image))
         }.resume()
     }

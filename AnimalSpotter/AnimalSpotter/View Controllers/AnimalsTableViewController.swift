@@ -14,16 +14,15 @@ class AnimalsTableViewController: UITableViewController {
     
     private var animalNames: [String] = [] {
         didSet {
-            tableView.reloadData()
+            DispatchQueue.main.async {
+                self.tableView.reloadData()
+            }
         }
     }
+    
     let apiController = APIController()
     
     // MARK: - View Lifecycle
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-    }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
@@ -34,7 +33,7 @@ class AnimalsTableViewController: UITableViewController {
         }
     }
     
-    // MARK: - Table view data source
+    // MARK: - Table View Data Source
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return animalNames.count
@@ -53,9 +52,14 @@ class AnimalsTableViewController: UITableViewController {
     @IBAction func getAnimals(_ sender: UIBarButtonItem) {
         // fetch all animals from API
         apiController.fetchAllAnimalNames { result in
-            if let names = try? result.get() {
+            do {
+                let names = try result.get()
                 DispatchQueue.main.async {
                     self.animalNames = names.sorted()
+                }
+            } catch {
+                if let error = error as? NetworkError {
+                    self.handleError(error)
                 }
             }
         }
@@ -70,12 +74,43 @@ class AnimalsTableViewController: UITableViewController {
                 loginVC.apiController = apiController
             }
         } else if segue.identifier == "ShowAnimalDetailSegue" {
-            if let detailVC = segue.destination as? AnimalDetailViewController {
-                if let indexPath = tableView.indexPathForSelectedRow {
-                    detailVC.animalName = animalNames[indexPath.row]
-                }
-                detailVC.apiController = apiController
-            }
+            guard let detailVC = segue.destination as? AnimalDetailViewController else { return }
+            guard let indexPath = tableView.indexPathForSelectedRow else { return }
+            guard indexPath.row < animalNames.count else { return }
+            
+            detailVC.animalName = animalNames[indexPath.row]
+            detailVC.apiController = apiController
+        }
+    }
+    
+    // MARK: - Error Handling
+
+    private func handleError(_ error: NetworkError) {
+        switch error {
+        case .noAuth:
+            print("No bearer token exists")
+            showAlert(title: "Not Signed In", message: "Please sign in.")
+        case .badAuth:
+            print("Bearer token invalid")
+            showAlert(title: "User Authentication Failed", message: "Try signing out and signing back in.")
+        case .otherError:
+            print("Other error occurred, see log")
+            showAlert(title: "A Problem Occured", message: "Please try again.")
+        case .badData:
+            print("No data received, or data corrupted")
+            showAlert(title: "Error Loading Page", message: "Please try again.")
+        case .decodingError:
+            print("JSON could not be decoded")
+            showAlert(title: "Error Loading Page", message: "Please try again.")
+        }
+    }
+    
+    private func showAlert(title: String?, message: String?) {
+        let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        let alertAction = UIAlertAction(title: "Ok", style: .default, handler: nil)
+        alertController.addAction(alertAction)
+        DispatchQueue.main.async {
+            self.present(alertController, animated: true, completion: nil)
         }
     }
 }

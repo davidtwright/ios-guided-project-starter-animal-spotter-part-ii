@@ -27,9 +27,7 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
         super.viewDidLoad()
         
         // customize button appearance
-        signInButton.backgroundColor = UIColor(hue: 190/360, saturation: 70/100, brightness: 80/100, alpha: 1.0)
-        signInButton.tintColor = .white
-        signInButton.layer.cornerRadius = 8.0
+        configureSignInButton()
     }
     
     // MARK: - Action Handlers
@@ -83,5 +81,11 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
             loginType = .signIn
             signInButton.setTitle("Sign In", for: .normal)
         }
+    }
+    
+    private func configureSignInButton() {
+        signInButton.backgroundColor = UIColor(hue: 190/360, saturation: 70/100, brightness: 80/100, alpha: 1.0)
+        signInButton.tintColor = .white
+        signInButton.layer.cornerRadius = 8.0
     }
 }
